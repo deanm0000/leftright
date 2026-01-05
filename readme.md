@@ -1,6 +1,4 @@
-This program simulates the dice game left right center. I was surprised at the results. Here's example output of various number of players with 1M simulations each.
-
-The rate biased by is the difference between fair odds (100/n) and the player's win rate.
+This program simulates the dice game left right center. Player 0 is the one who goes first up to the (n-1)th player. Players passing to the left goes to player i-1 except that player 0 passes to the (n-1)th player. Similarly, players passing to the right goes to player i+1 except player (i-1) goes to player 0.
 
 
 Results with 1M simulations:

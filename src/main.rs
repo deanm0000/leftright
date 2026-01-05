@@ -12,17 +12,25 @@ pub enum Die {
     Center,
     Dot,
 }
-
+impl Die {
+    pub fn roll() -> Self {
+        let weights = [1, 1, 1, 3];
+        let dist =
+            WeightedIndex::new(&weights).expect("weights should be non-negative and non-empty");
+        let mut myrng = rng();
+        match dist.sample(&mut myrng) {
+            0 => Die::Left,
+            1 => Die::Right,
+            2 => Die::Center,
+            3 => Die::Dot,
+            _ => unreachable!(),
+        }
+    }
+}
 #[derive(Debug, Clone)]
 struct Game {
     players: Vec<u8>,
 }
-
-enum GameState {
-    Normal,
-    Winner(usize),
-}
-
 impl Game {
     pub fn new(no_of_players: usize) -> Self {
         let mut players = Vec::with_capacity(no_of_players);
@@ -116,6 +124,7 @@ impl Game {
                     }
                 }
                 if !all_dots {
+                    // if player gets all dots, no need to check for winner
                     match self.is_there_winner() {
                         GameState::Winner(winner) => return winner,
                         GameState::Normal => {}
@@ -125,20 +134,10 @@ impl Game {
         }
     }
 }
-impl Die {
-    pub fn roll() -> Self {
-        let weights = [1, 1, 1, 3];
-        let dist =
-            WeightedIndex::new(&weights).expect("weights should be non-negative and non-empty");
-        let mut myrng = rng();
-        match dist.sample(&mut myrng) {
-            0 => Die::Left,
-            1 => Die::Right,
-            2 => Die::Center,
-            3 => Die::Dot,
-            _ => unreachable!(),
-        }
-    }
+
+enum GameState {
+    Normal,
+    Winner(usize),
 }
 
 fn main() {
