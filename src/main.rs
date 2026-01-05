@@ -163,7 +163,6 @@ fn main() {
     let to_print = games == 1;
     let player_wins = (0..games)
         .into_par_iter()
-        // create a “zeroed” local count array for each thread
         .fold(
             || vec![0usize; no_of_players],
             |mut local_counts, _| {
@@ -173,7 +172,6 @@ fn main() {
                 local_counts
             },
         )
-        // reduce: merge two local count arrays into one
         .reduce(
             || vec![0usize; no_of_players],
             |mut acc, local_counts| {
