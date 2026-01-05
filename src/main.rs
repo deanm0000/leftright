@@ -69,9 +69,8 @@ impl Game {
         }
     }
     pub fn play(mut self, prints: bool) -> usize {
+        let no_of_players = self.players.len().clone();
         loop {
-            let no_of_players = self.players.len().clone();
-
             for active_player in 0..no_of_players {
                 let chips = self.players[active_player].clone();
                 if prints {
