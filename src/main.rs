@@ -37,36 +37,37 @@ impl<R: RngCore> Game<R> {
             prints,
         }
     }
-    fn print_turn(&self, chips: &u8, active_player: &usize) {
+    fn print_turn(&self, active_player: &usize) {
         if !self.prints {
             return;
         }
-
+        let chips = self.players[*active_player];
         print!("\nplayer {active_player}'s turn with {chips} chips");
-        if chips > &0 {
+        if chips > 0 {
             print!(" rolled");
         }
     }
-    fn pass(&mut self, all_dots: &mut bool, active_player: usize, die: Die) {
-        let (res, dot) = match die {
+    fn roll(&mut self, all_dots: &mut bool, active_player: usize) {
+        let die: Die = self.rng.random();
+        let res = match die {
             Die::Left => {
                 self.pass_left(active_player);
-
-                (" left", false)
+                *all_dots = false;
+                " L"
             }
             Die::Right => {
                 self.pass_right(active_player);
-
-                (" right", false)
+                *all_dots = false;
+                " R"
             }
             Die::Center => {
                 self.players[active_player] -= 1;
-
-                (" center", false)
+                *all_dots = false;
+                " C"
             }
-            Die::Dot => (" dot", true),
+            Die::Dot => " D",
         };
-        *all_dots = *all_dots && dot;
+
         if self.prints {
             print!("{res}");
         }
@@ -83,11 +84,11 @@ impl<R: RngCore> Game<R> {
         self.players[right_player] += 1;
         self.players[active_player] -= 1;
     }
-    fn print_ending(&self, active_player: usize) {
+    fn print_ending(&self, active_player: &usize) {
         if !self.prints {
             return;
         }
-        let chips = self.players[active_player];
+        let chips = self.players[*active_player];
         print!(". Ending with {chips} chips");
     }
     fn is_there_winner(&self) -> GameState {
@@ -116,17 +117,16 @@ impl<R: RngCore> Game<R> {
         loop {
             for active_player in 0..no_of_players {
                 let chips = self.players[active_player];
-                self.print_turn(&chips, &active_player);
+                self.print_turn(&active_player);
                 if chips == 0u8 {
                     continue;
                 }
                 let dice_to_roll = min(chips, MAX_DICE);
                 let mut all_dots = true;
                 for _ in 0..dice_to_roll {
-                    let die: Die = self.rng.random();
-                    self.pass(&mut all_dots, active_player, die);
+                    self.roll(&mut all_dots, active_player);
                 }
-                self.print_ending(active_player);
+                self.print_ending(&active_player);
 
                 if !all_dots {
                     // if player gets all dots, no need to check for winner
